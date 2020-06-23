@@ -2,6 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import TodoItem from './TodoItem.js';
+import TodoForm from './TodoForm';
+import Counter from './Counter';
 
 class Todo extends React.Component {
   state = {
@@ -15,7 +17,7 @@ class Todo extends React.Component {
 
   handleSubmit = (event) => {
     event.preventDefault();
-    if (this.state.newItem.length == 0) return;
+    if (this.state.newItem.length === 0) return;
     let items = [...this.state.items];
     items.push({ name: this.state.newItem, done: false });
     this.setState({ items, newItem: '' });
@@ -35,10 +37,18 @@ class Todo extends React.Component {
     this.setState({ items });
   };
 
+  handleRemoveComplete = () => {
+    let items = this.state.items;
+    items = items.filter((item) => {
+      return !item.done;
+    });
+    this.setState({ items });
+  };
+
   render() {
     return (
-      <div>
-        <h1>todo list</h1>
+      <div className="todo-container">
+        <h2>todo list</h2>
         <ul className="todo-list">
           {this.state.items.map((element, i) => {
             return (
@@ -52,15 +62,21 @@ class Todo extends React.Component {
             );
           })}
         </ul>
-        <form onSubmit={this.handleSubmit}>
-          <input
-            type="text"
-            onChange={this.handleChange}
-            value={this.state.newItem}
-          />
-          <button type="submit">enter</button>
-          <button onClick={this.checkAll}>check all</button>
-        </form>
+        <TodoForm
+          onSubmit={this.handleSubmit}
+          onChange={this.handleChange}
+          newItem={this.state.newItem}
+          checkAll={this.checkAll}
+        />
+        <div className="button-group">
+          <button onClick={this.checkAll}>Check All</button>
+          {this.state.items.some((item) => item.done) ? (
+            <button onClick={this.handleRemoveComplete}>Clear done</button>
+          ) : null}
+        </div>
+        {this.state.items.length > 0 ? (
+          <Counter items={this.state.items} />
+        ) : null}
       </div>
     );
   }
